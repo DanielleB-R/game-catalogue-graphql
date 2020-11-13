@@ -9,21 +9,21 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
+	"github.com/DanielleB-R/game-catalogue-graphql/database"
 	"github.com/DanielleB-R/game-catalogue-graphql/schema"
 )
 
 func main() {
 	db := sqlx.MustConnect("postgres", os.Getenv("DB_URL"))
 
-	var platformCount []int
-	err := db.Select(&platformCount, "SELECT COUNT(*) FROM platform")
+	platforms, err := database.GetAllPlatforms(db)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Platform count in database is: ", platformCount[0])
+	fmt.Println("Platform count in database is: ", len(platforms))
 
-	graphqlSchema, err := schema.Get()
+	graphqlSchema, err := schema.Get(db)
 	if err != nil {
 		panic(err)
 	}
