@@ -26,3 +26,18 @@ func GetGameByID(id int) (*Game, error) {
 	}
 	return &game, nil
 }
+
+func CreateGame(name string, platformID int) (*Game, error) {
+	newRow := DB.QueryRowx(
+		"INSERT INTO game(name, platform) VALUES ($1, $2) RETURNING *",
+		name,
+		platformID,
+	)
+
+	var game Game
+	err := newRow.StructScan(&game)
+	if err != nil {
+		return nil, err
+	}
+	return &game, nil
+}

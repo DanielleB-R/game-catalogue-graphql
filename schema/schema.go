@@ -72,6 +72,23 @@ func Get() (graphql.Schema, error) {
 					return database.CreatePlatform(name)
 				},
 			},
+			"createGame": &graphql.Field{
+				Type:        GameType,
+				Description: "Add a game to a platform",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"platformID": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name := params.Args["name"].(string)
+					platformID := params.Args["platformID"].(int)
+					return database.CreateGame(name, platformID)
+				},
+			},
 		},
 	})
 
