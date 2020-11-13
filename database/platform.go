@@ -2,8 +2,6 @@ package database
 
 import (
 	"fmt"
-
-	"github.com/jmoiron/sqlx"
 )
 
 type Platform struct {
@@ -11,9 +9,9 @@ type Platform struct {
 	Name string `db:"name" json:"name"`
 }
 
-func GetAllPlatforms(db *sqlx.DB) ([]Platform, error) {
+func GetAllPlatforms() ([]Platform, error) {
 	var platforms []Platform
-	err := db.Select(&platforms, "SELECT * FROM platform ORDER BY id")
+	err := DB.Select(&platforms, "SELECT * FROM platform ORDER BY id")
 	if err != nil {
 		return nil, fmt.Errorf("Error getting platforms, %w", err)
 	}
@@ -21,17 +19,17 @@ func GetAllPlatforms(db *sqlx.DB) ([]Platform, error) {
 	return platforms, nil
 }
 
-func GetPlatformByID(db *sqlx.DB, id int) (*Platform, error) {
+func GetPlatformByID(id int) (*Platform, error) {
 	var platform Platform
-	err := db.Get(&platform, "SELECT * FROM platform WHERE id=$1", id)
+	err := DB.Get(&platform, "SELECT * FROM platform WHERE id=$1", id)
 	if err != nil {
 		return nil, fmt.Errorf("Error getting platform, %w", err)
 	}
 	return &platform, nil
 }
 
-func CreatePlatform(db *sqlx.DB, name string) (*Platform, error) {
-	newRow := db.QueryRowx(
+func CreatePlatform(name string) (*Platform, error) {
+	newRow := DB.QueryRowx(
 		"INSERT INTO platform(name) VALUES ($1) RETURNING *",
 		name,
 	)

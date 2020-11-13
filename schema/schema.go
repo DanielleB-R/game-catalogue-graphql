@@ -2,12 +2,11 @@ package schema
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/jmoiron/sqlx"
 
 	"github.com/DanielleB-R/game-catalogue-graphql/database"
 )
 
-func Get(db *sqlx.DB) (graphql.Schema, error) {
+func Get() (graphql.Schema, error) {
 	rootQuery := graphql.NewObject(graphql.ObjectConfig{Name: "Query", Fields: graphql.Fields{
 		"platform": &graphql.Field{
 			Type:        PlatformType,
@@ -20,7 +19,7 @@ func Get(db *sqlx.DB) (graphql.Schema, error) {
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 				id, isOK := params.Args["id"].(int)
 				if isOK {
-					platform, err := database.GetPlatformByID(db, id)
+					platform, err := database.GetPlatformByID(id)
 					if err == nil {
 						return platform, nil
 					}
@@ -39,7 +38,7 @@ func Get(db *sqlx.DB) (graphql.Schema, error) {
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 				id, isOK := params.Args["id"].(int)
 				if isOK {
-					game, err := database.GetGameByID(db, id)
+					game, err := database.GetGameByID(id)
 					if err == nil {
 						return game, nil
 					}
@@ -63,7 +62,7 @@ func Get(db *sqlx.DB) (graphql.Schema, error) {
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					name, _ := params.Args["name"].(string)
 
-					return database.CreatePlatform(db, name)
+					return database.CreatePlatform(name)
 				},
 			},
 		},

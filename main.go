@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/graphql-go/handler"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
 	"github.com/DanielleB-R/game-catalogue-graphql/database"
@@ -14,16 +12,14 @@ import (
 )
 
 func main() {
-	db := sqlx.MustConnect("postgres", os.Getenv("DB_URL"))
-
-	platforms, err := database.GetAllPlatforms(db)
+	platforms, err := database.GetAllPlatforms()
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Platform count in database is: ", len(platforms))
 
-	graphqlSchema, err := schema.Get(db)
+	graphqlSchema, err := schema.Get()
 	if err != nil {
 		panic(err)
 	}
