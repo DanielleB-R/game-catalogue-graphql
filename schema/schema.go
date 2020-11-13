@@ -20,7 +20,7 @@ func Get(db *sqlx.DB) (graphql.Schema, error) {
 		},
 	})
 
-	rootQuery := graphql.ObjectConfig{Name: "Query", Fields: graphql.Fields{
+	rootQuery := graphql.NewObject(graphql.ObjectConfig{Name: "Query", Fields: graphql.Fields{
 		"platform": &graphql.Field{
 			Type:        platformType,
 			Description: "Get a platform by ID",
@@ -40,7 +40,30 @@ func Get(db *sqlx.DB) (graphql.Schema, error) {
 				return nil, nil
 			},
 		},
-	}}
+	}})
 
-	return graphql.NewSchema(graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)})
+	rootMutation := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Mutation",
+		Fields: graphql.Fields{
+			"createPlatform": &graphql.Field{
+				Type:        platformType,
+				Description: "Add a new gaming platform",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name, _ := params.Args["name"].(string)
+
+					return database.CreatePlatform(db, name)
+				},
+			},
+		},
+	})
+
+	return graphql.NewSchema(graphql.SchemaConfig{
+		Query:    rootQuery,
+		Mutation: rootMutation,
+	})
 }

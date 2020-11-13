@@ -29,3 +29,17 @@ func GetPlatformByID(db *sqlx.DB, id int) (*Platform, error) {
 	}
 	return &platform, nil
 }
+
+func CreatePlatform(db *sqlx.DB, name string) (*Platform, error) {
+	newRow := db.QueryRowx(
+		"INSERT INTO platform(name) VALUES ($1) RETURNING *",
+		name,
+	)
+
+	var platform Platform
+	err := newRow.StructScan(&platform)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating platform: %w", err)
+	}
+	return &platform, nil
+}
