@@ -27,6 +27,13 @@ func Get() (graphql.Schema, error) {
 				return nil, nil
 			},
 		},
+		"platforms": &graphql.Field{
+			Type:        graphql.NewList(PlatformType),
+			Description: "All of the platforms",
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				return database.GetAllPlatforms()
+			},
+		},
 		"game": &graphql.Field{
 			Type:        GameType,
 			Description: "Get a game by ID",

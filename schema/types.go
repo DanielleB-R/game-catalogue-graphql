@@ -1,6 +1,9 @@
 package schema
 
-import "github.com/graphql-go/graphql"
+import (
+	"github.com/DanielleB-R/game-catalogue-graphql/database"
+	"github.com/graphql-go/graphql"
+)
 
 var PlatformType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Platform",
@@ -10,6 +13,13 @@ var PlatformType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"name": &graphql.Field{
 			Type: graphql.String,
+		},
+		"games": &graphql.Field{
+			Type: graphql.NewList(GameType),
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				platform := params.Source.(*database.Platform)
+				return database.GetPlatformGames(platform.ID)
+			},
 		},
 	},
 })
