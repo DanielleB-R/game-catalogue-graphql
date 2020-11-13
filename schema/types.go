@@ -33,8 +33,15 @@ var GameType = graphql.NewObject(graphql.ObjectConfig{
 		"name": &graphql.Field{
 			Type: graphql.String,
 		},
-		"platformID": &graphql.Field{
-			Type: graphql.Int,
-		},
 	},
 })
+
+func init() {
+	GameType.AddFieldConfig("platform", &graphql.Field{
+		Type: PlatformType,
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			game := params.Source.(*database.Game)
+			return database.GetPlatformByID(game.PlatformID)
+		},
+	})
+}
