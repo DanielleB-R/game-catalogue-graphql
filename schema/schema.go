@@ -53,6 +53,23 @@ func Get() (graphql.Schema, error) {
 				return nil, nil
 			},
 		},
+		"tag": &graphql.Field{
+			Type:        TagType,
+			Description: "Get a tag by ID",
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type: graphql.Int,
+				},
+			},
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				id := params.Args["id"].(int)
+				tag, err := database.GetTagByID(id)
+				if err == nil {
+					return tag, nil
+				}
+				return nil, nil
+			},
+		},
 	}})
 
 	rootMutation := graphql.NewObject(graphql.ObjectConfig{
@@ -87,6 +104,23 @@ func Get() (graphql.Schema, error) {
 					name := params.Args["name"].(string)
 					platformID := params.Args["platformID"].(int)
 					return database.CreateGame(name, platformID)
+				},
+			},
+			"createTags": &graphql.Field{
+				Type:        graphql.NewList(GameType),
+				Description: "Add tags to the list of tags",
+				Args: graphql.FieldConfigArgument{
+					"names": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.NewList(graphql.String)),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					nameInterfaces := params.Args["names"].([]interface{})
+					names := []string{}
+					for _, nameInterface := range nameInterfaces {
+						names = append(names, nameInterface.(string))
+					}
+					return database.CreateTags(names)
 				},
 			},
 		},

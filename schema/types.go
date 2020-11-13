@@ -36,6 +36,25 @@ var GameType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var TagType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Tag",
+	Fields: graphql.Fields{
+		"id": &graphql.Field{
+			Type: graphql.Int,
+		},
+		"name": &graphql.Field{
+			Type: graphql.String,
+		},
+		"games": &graphql.Field{
+			Type: graphql.NewList(GameType),
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				tag := params.Source.(*database.Tag)
+				return database.GetGamesByTagID(tag.ID)
+			},
+		},
+	},
+})
+
 func init() {
 	GameType.AddFieldConfig("platform", &graphql.Field{
 		Type: PlatformType,
