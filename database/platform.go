@@ -9,8 +9,8 @@ type Platform struct {
 	Name string `db:"name" json:"name"`
 }
 
-func GetAllPlatforms() ([]Platform, error) {
-	var platforms []Platform
+func GetAllPlatforms() ([]*Platform, error) {
+	var platforms []*Platform
 	err := DB.Select(&platforms, "SELECT * FROM platform ORDER BY id")
 	if err != nil {
 		return nil, fmt.Errorf("Error getting platforms, %w", err)

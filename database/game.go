@@ -6,14 +6,14 @@ type Game struct {
 	PlatformID int    `db:"platform" json:"platformID"`
 }
 
-func GetAllGames() ([]Game, error) {
-	var games []Game
+func GetAllGames() ([]*Game, error) {
+	var games []*Game
 	err := DB.Select(&games, "SELECT * FROM game ORDER BY id")
 	return games, err
 }
 
-func GetPlatformGames(platformID int) ([]Game, error) {
-	var games []Game
+func GetPlatformGames(platformID int) ([]*Game, error) {
+	var games []*Game
 	err := DB.Select(&games, "SELECT * FROM game WHERE platform=$1 ORDER BY id", platformID)
 	return games, err
 }
