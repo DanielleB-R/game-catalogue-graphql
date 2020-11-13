@@ -8,21 +8,9 @@ import (
 )
 
 func Get(db *sqlx.DB) (graphql.Schema, error) {
-	platformType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Platform",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-		},
-	})
-
 	rootQuery := graphql.NewObject(graphql.ObjectConfig{Name: "Query", Fields: graphql.Fields{
 		"platform": &graphql.Field{
-			Type:        platformType,
+			Type:        PlatformType,
 			Description: "Get a platform by ID",
 			Args: graphql.FieldConfigArgument{
 				"id": &graphql.ArgumentConfig{
@@ -40,13 +28,32 @@ func Get(db *sqlx.DB) (graphql.Schema, error) {
 				return nil, nil
 			},
 		},
+		"game": &graphql.Field{
+			Type:        GameType,
+			Description: "Get a game by ID",
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type: graphql.Int,
+				},
+			},
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				id, isOK := params.Args["id"].(int)
+				if isOK {
+					game, err := database.GetGameByID(db, id)
+					if err == nil {
+						return game, nil
+					}
+				}
+				return nil, nil
+			},
+		},
 	}})
 
 	rootMutation := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
 		Fields: graphql.Fields{
 			"createPlatform": &graphql.Field{
-				Type:        platformType,
+				Type:        PlatformType,
 				Description: "Add a new gaming platform",
 				Args: graphql.FieldConfigArgument{
 					"name": &graphql.ArgumentConfig{
