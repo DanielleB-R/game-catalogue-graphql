@@ -63,4 +63,12 @@ func init() {
 			return database.GetPlatformByID(game.PlatformID)
 		},
 	})
+
+	GameType.AddFieldConfig("tags", &graphql.Field{
+		Type: graphql.NewList(TagType),
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			game := params.Source.(*database.Game)
+			return database.GetTagsByGameID(game.ID)
+		},
+	})
 }

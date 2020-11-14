@@ -123,6 +123,27 @@ func Get() (graphql.Schema, error) {
 					return database.CreateTags(names)
 				},
 			},
+			"tagGames": &graphql.Field{
+				Type:        graphql.String,
+				Description: "Add a tag to a selection of games",
+				Args: graphql.FieldConfigArgument{
+					"tagID": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"gameIDs": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.NewList(graphql.Int)),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					tagID := params.Args["tagID"].(int)
+					gameIDsI := params.Args["gameIDs"].([]interface{})
+					gameIDs := []int{}
+					for _, gameIDI := range gameIDsI {
+						gameIDs = append(gameIDs, gameIDI.(int))
+					}
+					return nil, database.TagGames(tagID, gameIDs)
+				},
+			},
 		},
 	})
 

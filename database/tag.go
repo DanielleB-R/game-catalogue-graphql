@@ -18,6 +18,12 @@ func GetTagByID(id int) (*Tag, error) {
 	return &tag, nil
 }
 
+func GetTagsByGameID(gameID int) ([]*Tag, error) {
+	var tags []*Tag
+	err := DB.Select(&tags, "SELECT tag.* FROM tag JOIN game_tag ON tag.id = game_tag.tag_id WHERE game_tag.game_id=$1", gameID)
+	return tags, err
+}
+
 func CreateTags(names []string) ([]*Tag, error) {
 	for _, name := range names {
 		_, err := DB.Exec(
@@ -40,4 +46,19 @@ func CreateTags(names []string) ([]*Tag, error) {
 		return nil, err
 	}
 	return tags, nil
+}
+
+func TagGames(id int, gameIDs []int) error {
+	for _, gameID := range gameIDs {
+		_, err := DB.Exec(
+			"INSERT INTO game_tag(tag_id, game_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+			id,
+			gameID,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
